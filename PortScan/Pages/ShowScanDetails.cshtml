@@ -1,0 +1,21 @@
+﻿@page
+@model ShowScanDetailsModel
+@{
+    ViewData["Title"] = "Детали";
+}
+
+<form>
+    <div>
+        <label for="field1">Адрес</label>
+        <p id="field1">@ShowScanDetailsModel.ScaningModelArray.IpAdress</p>
+    </div>
+    <div>
+        <label for="field2">Дата и время запроса</label>
+        <p id="field2">@ShowScanDetailsModel.ScaningModelArray.DateScan</p>
+    </div>
+    <div>
+        <label for="field3">Открытые порты</label>
+        <p id="field3">@ShowScanDetailsModel.ScaningModelArray.Port</p>
+    </div>
+</form>
+

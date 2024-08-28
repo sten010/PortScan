@@ -1,0 +1,63 @@
+﻿@page
+@using PortScan.Model
+@using ServerScanPort.Data
+@model ScanPortModel
+@{
+    ViewData["Title"] = "Сканирование ip-адреса";
+}
+<head>
+    <link rel="stylesheet" href="MainPage.css">
+
+
+    <script src="~/js/MainPage.js"></script>
+</head>
+
+<div class="text-center">
+    <form>
+        <div class="container">
+            <div class="input-group mb-3">
+                <input type="text" id="ip-address" class="form-control" placeholder="Укажите адрес для проверки" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button id="submit-button" class="btn btn-outline-secondary" type="button" disabled>Button</button>
+                </div>
+                <div class="input-group mb-3">
+                    <span id="error-message" class="error-message"></span>
+                </div>
+                
+            </div>
+                
+        </div>
+    </form>
+
+    <br />
+    <h1> История поисков</h1>
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">ip хоста</th>
+                    <th scope="col">найденные порты</th>
+                    <th scope="col">времени последнего запуска</th>
+                    <th scope="col">Доп.сведенья</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (ScaningModel item in ScanPortModel.ScaningModelArray)
+                {
+                    <tr>
+                        <th scope="row">@item.Id</th>
+                        <td>@item.IpAdress</td>
+                        <td>@item.Port</td>
+                        <td>@item.DateScan</td>
+                        <td>
+                            <button>
+                                <a asp-page="/ShowScanDetails" asp-route-id="@item.Id">Детали</a>
+                            </button>
+                            </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
