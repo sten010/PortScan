@@ -88,6 +88,7 @@ namespace ServerScanPort.Controllers
             //Запуск приложения для получения портов
             ServerScanPort.Operation.Nmap nmap = new();
             scaning.Port = nmap.TakePorts(scaning.IpAdress);
+            scaning.DateScan = DateTime.Now;
 
 
             _context.Scanings.Add(scaning);

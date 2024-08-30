@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServerScanPort.Data;
 using System.Diagnostics;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ServerScanPort.Operation
 {
@@ -8,52 +10,83 @@ namespace ServerScanPort.Operation
     {
         public string TakePorts(string IpAdress)
         {
-            List<PortScan> PortScan = new(); 
-            if (string.IsNullOrWhiteSpace(IpAdress))
-            {
-                return null;
-            }
-            string findPort = StartScan(IpAdress);
-            if (string.IsNullOrEmpty(findPort))
+            string? NmapRead = RunCommand(IpAdress);
+            if (string.IsNullOrEmpty(NmapRead))
             {
                 return "Нет открытых портов.";
             }
-            return findPort;
-        }
-        private string? StartScan(string IpAdress)
-        {
-            try
+            List<string> portArray = GetActivePorts(NmapRead);
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (var port in portArray)
             {
-                // Запускаем команду nmap
-                var process = new Process
+                stringBuilder.Append(port + "\n");
+            }
+
+            return stringBuilder.ToString();
+        }
+        private List<string> GetActivePorts(string NmapRead)
+        {
+            List<string> activePort = new();
+            IEnumerable<string> splitNmap = NmapRead.Split('\n');
+
+            foreach (string nmap in splitNmap)
+            {
+                if (!StartsWithNumber(nmap)) continue;
+                activePort.Add(nmap);
+            }
+            return activePort;
+        }
+        public static bool StartsWithNumber(string input)
+        {
+            // Регулярное выражение для проверки, начинается ли строка с цифры
+            string pattern = @"^\d";
+            Regex regex = new Regex(pattern);
+
+            // Проверка, соответствует ли начало строки регулярному выражению
+            return regex.IsMatch(input);
+        }
+        static string? RunCommand(string ipAdress)
+        {
+            string nmapPath = @"C:\Program Files (x86)\Nmap\nmap.exe";
+
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = "powershell.exe",
+                Arguments = $"-Command \"cd C:\\; & '{nmapPath}' -T4 {ipAdress}\"",
+                UseShellExecute = false, // Для перенаправления вывода
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+                Verb = "runas"
+            };
+
+            using (Process process = new Process { StartInfo = startInfo })
+            {
+                try
                 {
-                    StartInfo = new ProcessStartInfo
+                    process.Start();
+
+                    // Чтение вывода и ошибок
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+
+                    process.WaitForExit();
+
+                    // Выводим результат
+                    if (process.ExitCode != 0)
                     {
-                        FileName = "nmap",
-                        Arguments = $"-T4 -F {IpAdress}",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
+                        return null;
                     }
-                };
-
-                process.Start();
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-                process.WaitForExit();
-
-                if (process.ExitCode == 0)
+                    else
+                    {
+                        return output;
+                    }
+                }
+                catch
                 {
                     return null;
                 }
-                return process.StandardOutput.ReadToEnd();
             }
-            catch(Exception ex)
-            {
-                
-            }
-            return null;
         }
     }
 }
