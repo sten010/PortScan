@@ -29,9 +29,6 @@ namespace ServerScanPort.Migrations
                 columns: new[] { "Id", "DateScan", "IpAdress" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 8, 28, 7, 42, 31, 260, DateTimeKind.Utc).AddTicks(3690), "123.123.123.123" },
-                    { 2, new DateTime(2024, 8, 28, 7, 42, 31, 260, DateTimeKind.Utc).AddTicks(3728), "223.123.123.123" },
-                    { 3, new DateTime(2024, 8, 28, 7, 42, 31, 260, DateTimeKind.Utc).AddTicks(3729), "323.123.123.123" }
                 });
         }
 
